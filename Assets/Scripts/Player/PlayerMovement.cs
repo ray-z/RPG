@@ -9,6 +9,7 @@ public class PlayerMovement : MonoBehaviour
 	private Rigidbody rb;
 	private Animator anim;
 	private HashIDs hash;
+	private bool isAttacking;
 	
 	void Awake () 
 	{
@@ -19,6 +20,8 @@ public class PlayerMovement : MonoBehaviour
 	
 	void Update ()
 	{
+		int layerZeroStateHash = anim.GetCurrentAnimatorStateInfo(0).nameHash;
+		isAttacking = (layerZeroStateHash == hash.attackState);
 	}
 	
 	void FixedUpdate () 
@@ -27,7 +30,8 @@ public class PlayerMovement : MonoBehaviour
 		#if UNITY_STANDALONE || UNITY_WEBPLAYER
 		moveInput = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
 		#elif UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE
-		moveInput = new Vector3(CrossPlatformInputManager.GetAxis("Horizontal"), 0f, CrossPlatformInputManager.GetAxis("Vertical"));
+		moveInput = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
+		//moveInput = new Vector3(CrossPlatformInputManager.GetAxis("Horizontal"), 0f, CrossPlatformInputManager.GetAxis("Vertical"));
 		#endif
 
 		moveInput = moveInput.normalized;	// avoid faster speed in diagonal
@@ -41,6 +45,8 @@ public class PlayerMovement : MonoBehaviour
 	
 	void Move (Vector3 moveInput)
 	{
+		if (isAttacking)
+			return;
 		Vector3 movement = moveInput * moveSpeed * Time.deltaTime;
 		rb.MovePosition(rb.position + movement);
 	}
@@ -53,7 +59,8 @@ public class PlayerMovement : MonoBehaviour
 	
 	public void Attack ()
 	{
-		anim.SetTrigger(hash.attackTrigger);
+		if (!isAttacking)
+			anim.SetTrigger(hash.attackTrigger);
 	}
 	
 	/*
