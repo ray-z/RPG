@@ -5,12 +5,14 @@ using UnityStandardAssets.CrossPlatformInput;
 public class PlayerMovement : MonoBehaviour 
 {
 	public float moveSpeed = 10f;
+	public float jumpSpeed = 5f;
 
 	private Rigidbody rb;
 	private Animator anim;
 	private HashIDs hash;
 	private bool isAttacking;
-	
+	private bool isGrounded;
+
 	void Awake () 
 	{
 		rb = GetComponent <Rigidbody> ();
@@ -20,8 +22,8 @@ public class PlayerMovement : MonoBehaviour
 	
 	void Update ()
 	{
-		int layerZeroStateHash = anim.GetCurrentAnimatorStateInfo(0).nameHash;
-		isAttacking = (layerZeroStateHash == hash.attackState);
+		isAttacking = (anim.GetCurrentAnimatorStateInfo(0).fullPathHash == hash.attackState);
+		isGrounded = Physics.Raycast (transform.position, - Vector3.up, 0.1f);
 	}
 	
 	void FixedUpdate () 
@@ -45,8 +47,7 @@ public class PlayerMovement : MonoBehaviour
 	
 	void Move (Vector3 moveInput)
 	{
-		if (isAttacking)
-			return;
+
 		Vector3 movement = moveInput * moveSpeed * Time.deltaTime;
 		rb.MovePosition(rb.position + movement);
 	}
@@ -56,11 +57,11 @@ public class PlayerMovement : MonoBehaviour
 		Quaternion rotation = Quaternion.LookRotation(moveInput);
 		rb.MoveRotation(rotation);
 	}
-	
-	public void Attack ()
+
+	public void Jump ()
 	{
-		if (!isAttacking)
-			anim.SetTrigger(hash.attackTrigger);
+		if (isGrounded)
+			rb.velocity += Vector3.up * jumpSpeed;
 	}
 	
 	/*
