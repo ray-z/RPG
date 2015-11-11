@@ -5,25 +5,26 @@ using UnityStandardAssets.CrossPlatformInput;
 public class PlayerMovement : MonoBehaviour 
 {
 	public float moveSpeed = 10f;
+	public float rotateSpeed = 15f;
 	public float jumpSpeed = 5f;
 
-	private Rigidbody rb;
-	private Animator anim;
-	private HashIDs hash;
-	private bool isAttacking;
-	private bool isGrounded;
+	//private Rigidbody rb;
+	//private Animator anim;
+	//private HashIDs hash;
+	private PlayerController pc;
+	private bool isOnGround;
 
-	void Awake () 
+	void Start () 
 	{
-		rb = GetComponent <Rigidbody> ();
-		anim = GetComponent <Animator> ();
-		hash = GameObject.FindWithTag(Tags.gameController).GetComponent<HashIDs>();
+		pc = GetComponent <PlayerController> ();
+		//rb = GetComponent <Rigidbody> ();
+		//anim = GetComponent <Animator> ();
+		//hash = GameObject.FindWithTag(Tags.gameController).GetComponent<HashIDs>();
 	}
 	
 	void Update ()
 	{
-		isAttacking = (anim.GetCurrentAnimatorStateInfo(0).fullPathHash == hash.attackState);
-		isGrounded = Physics.Raycast (transform.position, - Vector3.up, 0.1f);
+		isOnGround = Physics.Raycast (transform.position, - Vector3.up, 0.1f);
 	}
 	
 	void FixedUpdate () 
@@ -42,26 +43,30 @@ public class PlayerMovement : MonoBehaviour
 			Turn(moveInput);
 			Move(moveInput);
 		}
-		anim.SetFloat(hash.speedFloat, moveInput.magnitude);
+		pc.playerAnimator.SetFloat(HashIDs.speedFloat, moveInput.magnitude);
 	}
 	
 	void Move (Vector3 moveInput)
 	{
-
+		if (pc.isBlocking && isOnGround)
+			return;
 		Vector3 movement = moveInput * moveSpeed * Time.deltaTime;
-		rb.MovePosition(rb.position + movement);
+		pc.playerRigidbody.MovePosition(pc.playerRigidbody.position + movement);
 	}
 	
 	void Turn (Vector3 moveInput)
 	{
-		Quaternion rotation = Quaternion.LookRotation(moveInput);
-		rb.MoveRotation(rotation);
+		//Quaternion rotation = Quaternion.LookRotation(moveInput);
+		Quaternion rotation = Quaternion.Slerp(pc.playerRigidbody.rotation, 
+		                                       Quaternion.LookRotation(moveInput), 
+		                                       rotateSpeed*Time.deltaTime);
+		pc.playerRigidbody.MoveRotation(rotation);
 	}
 
 	public void Jump ()
 	{
-		if (isGrounded)
-			rb.velocity += Vector3.up * jumpSpeed;
+		if (isOnGround)
+			pc.playerRigidbody.velocity += Vector3.up * jumpSpeed;
 	}
 	
 	/*

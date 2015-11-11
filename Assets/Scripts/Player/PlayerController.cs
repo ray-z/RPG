@@ -3,29 +3,39 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour 
 {
-	private Rigidbody rb;
-	private Animator anim;
-	private HashIDs hash;
+	[HideInInspector]
+	public Rigidbody playerRigidbody;
+	[HideInInspector]
+	public Animator playerAnimator;
+	[HideInInspector]
+	public bool isBlocking;
+
 	private bool isAttacking;
 
 	// Use this for initialization
 	void Awake () 
 	{
-		rb = GetComponent <Rigidbody> ();
-		anim = GetComponent <Animator> ();
-		hash = GameObject.FindWithTag(Tags.gameController).GetComponent<HashIDs>();
+		playerRigidbody = GetComponent <Rigidbody> ();
+		playerAnimator = GetComponent <Animator> ();
+		//hashIDs = GameObject.FindWithTag(Tags.gameController).GetComponent<HashIDs>();
 	}
 	
 	// Update is called once per frame
 	void Update () 
 	{
-		isAttacking = (anim.GetCurrentAnimatorStateInfo(0).fullPathHash == hash.attackState);
+		isAttacking = (playerAnimator.GetCurrentAnimatorStateInfo(0).fullPathHash == HashIDs.attackState);
 	}
 
 	public void Attack ()
 	{
 		if (!isAttacking)
-			anim.SetTrigger(hash.attackTrigger);
+			playerAnimator.SetTrigger(HashIDs.attackTrigger);
+	}
+
+	public void SetBlockingState (bool isButtonDown)
+	{
+		isBlocking = isButtonDown;
+		playerAnimator.SetBool(HashIDs.isBlockingBool, isButtonDown);
 	}
 
 
