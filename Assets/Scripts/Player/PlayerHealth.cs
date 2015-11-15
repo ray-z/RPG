@@ -48,5 +48,10 @@ public class PlayerHealth : MonoBehaviour
 		
 		if (currentHealth <= 0f && !isDead)
 			OnDeath ();
+		else
+		{
+			if (!pc.isHitState)
+				pc.playerAnimator.SetTrigger(HashIDs.hitTrigger);
+		}
 	}
 }

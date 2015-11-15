@@ -8,7 +8,11 @@ public class PlayerController : MonoBehaviour
 	[HideInInspector]
 	public Animator playerAnimator;
 	[HideInInspector]
-	public bool isBlocking;
+	public bool isBlockState;
+	[HideInInspector]
+	public bool isHitState;
+	[HideInInspector]
+	public bool isDieState;
 
 	private bool isAttacking;
 
@@ -23,7 +27,11 @@ public class PlayerController : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-		isAttacking = (playerAnimator.GetCurrentAnimatorStateInfo(0).fullPathHash == HashIDs.attackState);
+		int baseState = playerAnimator.GetCurrentAnimatorStateInfo(0).fullPathHash;
+		int attackState = playerAnimator.GetCurrentAnimatorStateInfo(1).fullPathHash;
+		isAttacking = (attackState == HashIDs.attackState);
+		isHitState = (baseState == HashIDs.hitStrongState0 || attackState == HashIDs.hitStrongState1);
+		isDieState = (baseState == HashIDs.dieState);
 	}
 
 	public void Attack ()
@@ -34,7 +42,7 @@ public class PlayerController : MonoBehaviour
 
 	public void SetBlockingState (bool isButtonDown)
 	{
-		isBlocking = isButtonDown;
+		isBlockState = isButtonDown;
 		playerAnimator.SetBool(HashIDs.isBlockingBool, isButtonDown);
 	}
 

@@ -48,7 +48,7 @@ public class PlayerMovement : MonoBehaviour
 	
 	void Move (Vector3 moveInput)
 	{
-		if (pc.isBlocking && isOnGround)
+		if ((pc.isBlockState || pc.isHitState) && isOnGround)
 			return;
 		Vector3 movement = moveInput * moveSpeed * Time.deltaTime;
 		pc.playerRigidbody.MovePosition(pc.playerRigidbody.position + movement);
