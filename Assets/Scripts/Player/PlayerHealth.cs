@@ -8,17 +8,21 @@ public class PlayerHealth : MonoBehaviour
 	public Image fillImage;
 	public Color fullHealthColor = Color.green;
 	public Color zeroHealthColor = Color.red;
+	public float repelForce = 50f;
+	[HideInInspector]
+	public float currentHealth;
 
-	private PlayerController pc;
-	private float currentHealth;
+	private Rigidbody rb;
+	private Animator anim;
 	private bool isDead;
 
-	private void Start ()
+	void Awake ()
 	{
-		pc = GetComponent <PlayerController> ();
+		anim = GetComponent <Animator> ();
+		rb = GetComponent <Rigidbody> ();
 	}
 
-	private void OnEnable ()
+	void OnEnable ()
 	{
 		currentHealth = startingHealth;
 		isDead = false;
@@ -26,32 +30,40 @@ public class PlayerHealth : MonoBehaviour
 		SetHealthUI();
 	}
 
-	private void SetHealthUI ()
+	void SetHealthUI ()
 	{
 		healthSlider.value = currentHealth;
 		
 		fillImage.color = Color.Lerp (zeroHealthColor, fullHealthColor, currentHealth / startingHealth);
 	}
 
-	private void OnDeath ()
+	void OnDeath ()
 	{
 		isDead = true;
-		pc.playerAnimator.SetBool(HashIDs.dieTrigger, true);
+		anim.SetBool(HashIDs.dieTrigger, true);
 		healthSlider.gameObject.SetActive(false);
 		//gameObject.SetActive (false);
+	}
+
+	void Repel (float damage)
+	{
+		Vector3 direction = -transform.forward + Vector3.up * 0.7f;
+		//rb.AddForce(direction.normalized * damage * 0.7f, ForceMode.VelocityChange);
+		rb.AddForce(direction.normalized * damage * repelForce);
 	}
 
 	public void TakeDamage (float amount)
 	{
 		currentHealth -= amount;
 		SetHealthUI ();
-		
+
+
 		if (currentHealth <= 0f && !isDead)
 			OnDeath ();
 		else
 		{
-			if (!pc.isHitState)
-				pc.playerAnimator.SetTrigger(HashIDs.hitTrigger);
+			anim.SetTrigger(HashIDs.hitTrigger);
+			Repel (amount);
 		}
 	}
 }

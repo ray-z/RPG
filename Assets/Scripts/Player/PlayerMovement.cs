@@ -8,18 +8,16 @@ public class PlayerMovement : MonoBehaviour
 	public float rotateSpeed = 15f;
 	public float jumpSpeed = 5f;
 
-	//private Rigidbody rb;
-	//private Animator anim;
-	//private HashIDs hash;
 	private PlayerController pc;
+	private Rigidbody rb;
+	private Animator anim;
 	private bool isOnGround;
 
-	void Start () 
+	void Awake () 
 	{
 		pc = GetComponent <PlayerController> ();
-		//rb = GetComponent <Rigidbody> ();
-		//anim = GetComponent <Animator> ();
-		//hash = GameObject.FindWithTag(Tags.gameController).GetComponent<HashIDs>();
+		rb = GetComponent <Rigidbody> ();
+		anim = GetComponent <Animator> ();
 	}
 	
 	void Update ()
@@ -43,7 +41,7 @@ public class PlayerMovement : MonoBehaviour
 			Turn(moveInput);
 			Move(moveInput);
 		}
-		pc.playerAnimator.SetFloat(HashIDs.speedFloat, moveInput.magnitude);
+		anim.SetFloat(HashIDs.speedFloat, moveInput.magnitude);
 	}
 	
 	void Move (Vector3 moveInput)
@@ -51,24 +49,23 @@ public class PlayerMovement : MonoBehaviour
 		if ((pc.isBlockState || pc.isHitState) && isOnGround)
 			return;
 		Vector3 movement = moveInput * moveSpeed * Time.deltaTime;
-		pc.playerRigidbody.MovePosition(pc.playerRigidbody.position + movement);
+		rb.MovePosition(rb.position + movement);
 	}
 	
 	void Turn (Vector3 moveInput)
 	{
 		//Quaternion rotation = Quaternion.LookRotation(moveInput);
-		Quaternion rotation = Quaternion.Slerp(pc.playerRigidbody.rotation, 
+		Quaternion rotation = Quaternion.Slerp(rb.rotation, 
 		                                       Quaternion.LookRotation(moveInput), 
 		                                       rotateSpeed*Time.deltaTime);
-		pc.playerRigidbody.MoveRotation(rotation);
+		rb.MoveRotation(rotation);
 	}
 
 	public void Jump ()
 	{
 		if (isOnGround)
-			pc.playerRigidbody.velocity += Vector3.up * jumpSpeed;
+			rb.velocity += Vector3.up * jumpSpeed;
 	}
-	
 	/*
 	 * Third person view with camera rotation
 	//float moveValue = CrossPlatformInputManager.GetAxis("Vertical");
