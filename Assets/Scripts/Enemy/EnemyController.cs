@@ -54,10 +54,10 @@ public class EnemyController : MonoBehaviour
 	public void Repel (float damageTaken)
 	{
 		anim.SetTrigger(HashIDs.hitTrigger);
-		//rb.AddForce(-transform.forward * damageTaken * repelForce);
+		rb.AddForce(-transform.forward * damageTaken * repelForce);
 
-		Vector3 direction = -transform.forward + Vector3.up * 0.7f;
+		//Vector3 direction = -transform.forward + Vector3.up * 0.7f;
 		//rb.AddForce(direction.normalized * damage * 0.7f, ForceMode.VelocityChange);
-		rb.AddForce(direction.normalized * damage * repelForce);
+		//rb.AddForce(direction.normalized * damage * repelForce);
 	}
 }

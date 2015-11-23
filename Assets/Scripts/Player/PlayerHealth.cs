@@ -12,12 +12,14 @@ public class PlayerHealth : MonoBehaviour
 	[HideInInspector]
 	public float currentHealth;
 
+	private PlayerController pc;
 	private Rigidbody rb;
 	private Animator anim;
 	private bool isDead;
 
 	void Awake ()
 	{
+		pc = GetComponent <PlayerController> ();
 		anim = GetComponent <Animator> ();
 		rb = GetComponent <Rigidbody> ();
 	}
@@ -54,6 +56,8 @@ public class PlayerHealth : MonoBehaviour
 
 	public void TakeDamage (float amount)
 	{
+		if (pc.isBlockState)
+			amount *= 0.5f;
 		currentHealth -= amount;
 		SetHealthUI ();
 
